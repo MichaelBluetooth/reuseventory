@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace ReuseventoryApi.Models
 {
@@ -14,6 +13,8 @@ namespace ReuseventoryApi.Models
         [EmailAddress]
         [MaxLength(254)]
         public string description { get; set; }
+
+        public byte[] image { get; set; }
 
         [ForeignKey("user")]
         public Guid? userId { get; set; }

@@ -21,6 +21,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using ReuseventoryApi.Authentication;
 using ReuseventoryApi.Models;
+using ReuseventoryApi.Models.DTO;
 using ReuseventoryApi.Services.CurrentUser;
 
 namespace ReuseventoryApi
@@ -139,10 +140,6 @@ namespace ReuseventoryApi
             var refreshTokenAction = builder.EntityType<User>().Collection.Action("RefreshToken");
             refreshTokenAction.Parameter<string>("refreshToken");
             refreshTokenAction.Returns<LoginResult>();
-
-            // var containerReceiveAction = builder.EntityType<Container>().Collection.Action("Receive");
-            // containerReceiveAction.CollectionParameter<ContainerReceipt>("containers");
-            // containerReceiveAction.ReturnsCollectionFromEntitySet<Container>("containers");
 
             return builder.GetEdmModel();
         }

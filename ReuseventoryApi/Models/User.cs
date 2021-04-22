@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -13,9 +14,16 @@ namespace ReuseventoryApi.Models
         [MaxLength(254)]
         public string email { get; set; }
 
+        [MaxLength(20)]
+        public string phone { get; set; }
+
         [Required]
         [JsonIgnore]
         [MaxLength(500)]
         public string password { get; set; }
+
+        public bool isAdmin { get; set; }
+
+        public ICollection<Listing> listings { get; set; }
     }
 }
