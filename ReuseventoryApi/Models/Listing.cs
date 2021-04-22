@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,7 +12,7 @@ namespace ReuseventoryApi.Models
         public string name { get; set; }
 
         [EmailAddress]
-        [MaxLength(254)]
+        [MaxLength(256)]
         public string description { get; set; }
 
         public byte[] image { get; set; }
@@ -19,5 +20,7 @@ namespace ReuseventoryApi.Models
         [ForeignKey("user")]
         public Guid? userId { get; set; }
         public User user { get; set; }
+
+        public ICollection<ListingTag> tags { get; set; }
     }
 }

@@ -52,6 +52,15 @@ namespace ReuseventoryApi
             services.AddAuthentication();
 
             var jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
+            if(null == jwtTokenConfig){
+                jwtTokenConfig = new JwtTokenConfig(){
+                    Secret = "Development-Only-Secret",
+                    Issuer = "localhost",
+                    Audience = "*",
+                    AccessTokenExpiration = 15000,
+                    RefreshTokenExpiration = 15000,
+                };
+            }
             services.AddSingleton(jwtTokenConfig);
             services.AddAuthentication(x =>
             {
@@ -124,6 +133,7 @@ namespace ReuseventoryApi
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<User>("Users");
             builder.EntitySet<Listing>("Listings");
+            builder.EntitySet<ListingTag>("ListingTags");
 
             var registerAction = builder.EntityType<User>().Collection.Action("Register");
             registerAction.Parameter<string>("username");

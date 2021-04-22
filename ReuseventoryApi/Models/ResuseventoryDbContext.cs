@@ -11,5 +11,6 @@ namespace ReuseventoryApi.Models
 
         public DbSet<User> Users { get; set; }
         public DbSet<Listing> Listings { get; set; }
+        public DbSet<ListingTag> ListingTags { get; set; }
     }
 }
