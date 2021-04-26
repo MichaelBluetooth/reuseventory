@@ -52,6 +52,7 @@ namespace ReuseventoryApi.Controllers
             return _ctx.Users.Any(p => p.id == key);
         }
 
+        [HttpGet]
         public ActionResult<PagedResult<User>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 0)
         {
             var results = _ctx.Users

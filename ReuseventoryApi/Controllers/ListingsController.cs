@@ -80,6 +80,7 @@ namespace ReuseventoryApi.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         public ActionResult<PagedResult<Listing>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 0)
         {
             var results = _ctx.Listings
@@ -109,6 +110,7 @@ namespace ReuseventoryApi.Controllers
         }
 
 
+        [HttpDelete]
         [Route("{key}")]
         public ActionResult Delete(Guid key)
         {
