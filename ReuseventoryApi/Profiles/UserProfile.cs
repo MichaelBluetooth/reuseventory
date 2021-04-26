@@ -10,6 +10,9 @@ namespace ReuseventoryApi.Profiles
         {
             CreateMap<UserDTO, User>();
             CreateMap<User, UserDTO>();
+
+            CreateMap<UserUpdate, User>()
+                .ForMember(u => u.password, opts => opts.Ignore()); //specialized logic required for password
         }
     }
 }

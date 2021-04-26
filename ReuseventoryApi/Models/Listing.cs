@@ -11,16 +11,16 @@ namespace ReuseventoryApi.Models
         [MaxLength(256)]
         public string name { get; set; }
 
-        [EmailAddress]
         [MaxLength(256)]
         public string description { get; set; }
-
-        public byte[] image { get; set; }
 
         [ForeignKey("user")]
         public Guid? userId { get; set; }
         public User user { get; set; }
 
         public ICollection<ListingTag> tags { get; set; }
+
+        public DateTime created { get; set; }
+        public DateTime modified { get; set; }
     }
 }

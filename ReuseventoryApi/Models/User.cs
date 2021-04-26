@@ -18,7 +18,6 @@ namespace ReuseventoryApi.Models
         public string phone { get; set; }
 
         [Required]
-        [JsonIgnore]
         [MaxLength(500)]
         public string password { get; set; }
 

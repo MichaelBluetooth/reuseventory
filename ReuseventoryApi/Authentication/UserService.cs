@@ -66,20 +66,13 @@ namespace ReuseventoryApi.Authentication
                    hasMinimum8Chars.IsMatch(password);
         }
 
-        public void update(Guid key, Delta<User> changes)
+        public void update(Guid key, UserUpdate changes)
         {
             User user = _ctx.Users.Find(key);
-            string oldPW = user.password;
-            changes.Patch(user);
-            object newPassword;
-            bool passwordRead = changes.TryGetPropertyValue("password", out newPassword);
-            if (passwordRead && null != newPassword && isValidPassword(newPassword.ToString()))
+            user = _mapper.Map(changes, user);
+            if (null != changes.password && isValidPassword(changes.password))
             {
-                user.password = BCrypt.Net.BCrypt.HashPassword(newPassword.ToString());
-            }
-            else
-            {
-                user.password = oldPW;
+                user.password = BCrypt.Net.BCrypt.HashPassword(changes.password);
             }
             _ctx.Users.Update(user);
         }

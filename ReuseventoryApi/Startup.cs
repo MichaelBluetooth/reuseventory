@@ -40,20 +40,20 @@ namespace ReuseventoryApi
         {
             services.AddDbContext<ReuseventoryDbContext>(opt => opt.UseInMemoryDatabase("ReuseventoryDbContext"));
 
-            services.AddControllers();
-            services.AddOData(opt =>
-            {
-                opt.AddModel("api", GetEdmModel()).Select().SetMaxTop(100).Expand().Filter().SkipToken();
-            });
-            // services.AddMvc();
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
             services.AddCors();
             services.AddAuthorization();
             services.AddAuthentication();
 
             var jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
-            if(null == jwtTokenConfig){
-                jwtTokenConfig = new JwtTokenConfig(){
+            if (null == jwtTokenConfig)
+            {
+                jwtTokenConfig = new JwtTokenConfig()
+                {
                     Secret = "Development-Only-Secret",
                     Issuer = "localhost",
                     Audience = "*",
@@ -92,10 +92,10 @@ namespace ReuseventoryApi
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IUserService, UserService>();
 
-            // services.AddSwaggerGen(c =>
-            // {
-            //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReuseventoryApi", Version = "v1" });
-            // });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReuseventoryApi", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,8 +104,8 @@ namespace ReuseventoryApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                // app.UseSwagger();
-                // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReuseventoryApi v1"));
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReuseventoryApi v1"));
             }
 
             app.UseCors(
@@ -126,32 +126,6 @@ namespace ReuseventoryApi
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private IEdmModel GetEdmModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<User>("Users");
-            builder.EntitySet<Listing>("Listings");
-            builder.EntitySet<ListingTag>("ListingTags");
-
-            var registerAction = builder.EntityType<User>().Collection.Action("Register");
-            registerAction.Parameter<string>("username");
-            registerAction.Parameter<string>("password");
-            registerAction.ReturnsFromEntitySet<User>("Users");
-
-            var loginAction = builder.EntityType<User>().Collection.Action("Login");
-            loginAction.Parameter<string>("username");
-            loginAction.Parameter<string>("password");
-            loginAction.Returns<LoginResult>();
-
-            builder.EntityType<User>().Collection.Action("Logout");
-
-            var refreshTokenAction = builder.EntityType<User>().Collection.Action("RefreshToken");
-            refreshTokenAction.Parameter<string>("refreshToken");
-            refreshTokenAction.Returns<LoginResult>();
-
-            return builder.GetEdmModel();
         }
     }
 }

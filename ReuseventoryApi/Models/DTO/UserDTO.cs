@@ -8,6 +8,5 @@ namespace ReuseventoryApi.Models.DTO
         public string email { get; set; }
         public string phone { get; set; }
         public bool isAdmin { get; set; }
-        public ICollection<Listing> listings { get; set; }
     }
 }

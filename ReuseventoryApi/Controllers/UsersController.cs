@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,22 +7,18 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Deltas;
-using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Results;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ReuseventoryApi.Authentication;
+using ReuseventoryApi.Helpers;
 using ReuseventoryApi.Models;
 using ReuseventoryApi.Models.DTO;
 
 namespace ReuseventoryApi.Controllers
 {
     [Authorize]
-    public class UsersController : ODataController
+    [Route("api/[controller]")]
+    public class UsersController : ControllerBase
     {
         private readonly ReuseventoryDbContext _ctx;
         private readonly IJwtAuthManager _jwtAuthManager;
@@ -38,6 +33,18 @@ namespace ReuseventoryApi.Controllers
             _jwtAuthManager = jwtAuthManager;
             _logger = logger;
             _mapper = mapper;
+
+            if (_ctx.Users.Count() == 0)
+            {
+                for (int i = 0; i < 250; i++)
+                {
+                    _ctx.Users.Add(new User()
+                    {
+                        username = new Guid().ToString()
+                    });
+                }
+                _ctx.SaveChanges();
+            }
         }
 
         private bool Exists(Guid key)
@@ -45,21 +52,32 @@ namespace ReuseventoryApi.Controllers
             return _ctx.Users.Any(p => p.id == key);
         }
 
-        [EnableQuery]
-        public IQueryable<User> Get()
+        public ActionResult<PagedResult<User>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 0)
         {
-            return _ctx.Users.HideSensitiveProperties();
+            var results = _ctx.Users
+                .ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
+                .GetPaged(page, pageSize);
+            return Ok(results);
         }
 
-        [EnableQuery]
-        public SingleResult<User> Get([FromODataUri] Guid key)
+        [HttpGet]
+        [Route("{key}")]
+        public ActionResult<User> Get(Guid key)
         {
-            IQueryable<User> result = _ctx.Users.Where(p => p.id == key);
-            return SingleResult.Create(result.HideSensitiveProperties());
+            if (Exists(key))
+            {
+                User result = _ctx.Users.Find(key);
+                return Ok(_mapper.Map<UserDTO>(result));
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
-        [EnableQuery]
-        public ActionResult Delete([FromODataUri] Guid key)
+        [HttpDelete]
+        [Route("{key}")]
+        public ActionResult Delete(Guid key)
         {
             User doomed = _ctx.Users.FirstOrDefault(p => p.id == key);
             if (null == doomed)
@@ -82,10 +100,15 @@ namespace ReuseventoryApi.Controllers
             return NoContent();
         }
 
-        [EnableQuery]
-        [HttpPatch]
-        public ActionResult Patch([FromODataUri] Guid key, [FromBody] Delta<User> changes)
+        [HttpPut]
+        [Route("{key}")]
+        public ActionResult Put([FromRoute] Guid key, [FromBody] UserUpdate changes)
         {
+            if (false == ModelState.IsValid)
+            {
+                return BadRequest("Model state invalid");
+            }
+
             if (false == _userService.isValidUpdate(key))
             {
                 return BadRequest("Users may only edit their own profiles or be an administrator");
@@ -100,20 +123,14 @@ namespace ReuseventoryApi.Controllers
                 return NotFound();
             }
 
-            IQueryable<User> result = _ctx.Users.Where(p => p.id == key);
-            return Ok(SingleResult.Create(result.HideSensitiveProperties()));
+            return Ok(_ctx.Users.Find(key));
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult Register(ODataActionParameters parameters)
+        [Route("register")]
+        public ActionResult Register([FromBody] LoginRequest request)
         {
-            LoginRequest request = new LoginRequest()
-            {
-                username = parameters["username"]?.ToString(),
-                password = parameters["password"]?.ToString()
-            };
-
             if (String.IsNullOrEmpty(request.username) || String.IsNullOrEmpty(request.password))
             {
                 return BadRequest();
@@ -134,19 +151,14 @@ namespace ReuseventoryApi.Controllers
             User registered = _userService.Register(request.username, request.password);
             _ctx.SaveChanges();
 
-            return Ok(registered.HideSensitivePropertiesForItem());
+            return Ok(_mapper.Map<UserDTO>(registered));
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult Login(ODataActionParameters parameters)
+        [Route("login")]
+        public ActionResult Login([FromBody] LoginRequest request)
         {
-            LoginRequest request = new LoginRequest()
-            {
-                username = parameters["username"]?.ToString(),
-                password = parameters["password"]?.ToString()
-            };
-
             if (String.IsNullOrEmpty(request.username) || String.IsNullOrEmpty(request.password))
             {
                 return BadRequest();
@@ -174,6 +186,7 @@ namespace ReuseventoryApi.Controllers
         }
 
         [HttpPost]
+        [Route("logout")]
         public ActionResult Logout()
         {
             string userName = User.Identity.Name;
@@ -183,13 +196,9 @@ namespace ReuseventoryApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> RefreshToken(ODataActionParameters parameters)
+        [Route("refresh-token")]
+        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            RefreshTokenRequest request = new RefreshTokenRequest()
-            {
-                refreshToken = parameters["refreshToken"]?.ToString(),
-            };
-
             try
             {
                 var userName = User.Identity.Name;
@@ -214,41 +223,6 @@ namespace ReuseventoryApi.Controllers
             {
                 return Unauthorized(e.Message); // return 401 so that the client side can redirect the user to login page
             }
-        }
-    }
-
-    public static class HideSensitivePropertiesExtensions
-    {
-        public static async Task<TData> HideSensitivePropertiesForItem<TData>(this Task<TData> task)
-            where TData : User
-        {
-            return (await task).HideSensitivePropertiesForItem();
-        }
-
-        public static TData HideSensitivePropertiesForItem<TData>(this TData item)
-            where TData : User
-        {
-            item.password = "";
-            return item;
-        }
-
-        public static SingleResult<TData> HideSensitiveProperties<TData>(this SingleResult<TData> singleResult)
-            where TData : User
-        {
-            return new SingleResult<TData>(singleResult.Queryable.HideSensitiveProperties());
-        }
-
-        public static IQueryable<TData> HideSensitiveProperties<TData>(this IQueryable<TData> query)
-            where TData : User
-        {
-            return query.ToList().HideSensitiveProperties().AsQueryable();
-        }
-
-        public static IEnumerable<TData> HideSensitiveProperties<TData>(this IEnumerable<TData> query)
-            where TData : User
-        {
-            foreach (var item in query)
-                yield return item.HideSensitivePropertiesForItem();
         }
     }
 }
