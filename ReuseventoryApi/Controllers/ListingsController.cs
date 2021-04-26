@@ -81,7 +81,7 @@ namespace ReuseventoryApi.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult<PagedResult<Listing>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 0)
+        public ActionResult<PagedResult<Listing>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 1)
         {
             var results = _ctx.Listings
                 .ProjectTo<ListingDTO>(_mapper.ConfigurationProvider)

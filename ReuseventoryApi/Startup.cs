@@ -35,10 +35,28 @@ namespace ReuseventoryApi
 
         public IConfiguration Configuration { get; }
 
+        private static bool IsDevelopment => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ReuseventoryDbContext>(opt => opt.UseInMemoryDatabase("ReuseventoryDbContext"));
+            if (IsDevelopment)
+            {
+                services.AddDbContext<ReuseventoryDbContext>(opt => opt.UseInMemoryDatabase("ReuseventoryDbContext")); x
+            }
+            else
+            {
+                services.AddDbContext<ReuseventoryDbContext>(opt =>
+                            {
+                                string connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                                Uri databaseUri = new Uri(connectionUrl);
+                                string db = databaseUri.LocalPath.TrimStart('/');
+                                string[] userInfo = databaseUri.UserInfo.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                                string connectionString = $"User ID={userInfo[0]};Password={userInfo[1]};Host={databaseUri.Host};Port={databaseUri.Port};Database={db};Pooling=true;SSL Mode=Require;Trust Server Certificate=True";
+                                opt.UseNpgsql(connectionString);
+                            });
+            }
+
 
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
@@ -99,8 +117,10 @@ namespace ReuseventoryApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ReuseventoryDbContext dataContext)
         {
+            dataContext.Database.Migrate();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
