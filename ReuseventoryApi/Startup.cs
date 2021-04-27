@@ -42,7 +42,7 @@ namespace ReuseventoryApi
         {
             if (IsDevelopment)
             {
-                services.AddDbContext<ReuseventoryDbContext>(opt => opt.UseInMemoryDatabase("ReuseventoryDbContext")); x
+                services.AddDbContext<ReuseventoryDbContext>(opt => opt.UseInMemoryDatabase("ReuseventoryDbContext"));
             }
             else
             {
