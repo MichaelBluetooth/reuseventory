@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
@@ -66,16 +67,20 @@ namespace ReuseventoryApi
             services.AddAuthorization();
             services.AddAuthentication();
 
-            var jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
-            if (null == jwtTokenConfig)
+            JwtTokenConfig jwtTokenConfig;
+            if (IsDevelopment)
+            {
+                jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
+            }
+            else
             {
                 jwtTokenConfig = new JwtTokenConfig()
                 {
-                    Secret = "Development-Only-Secret",
-                    Issuer = "localhost",
-                    Audience = "*",
-                    AccessTokenExpiration = 15000,
-                    RefreshTokenExpiration = 15000,
+                    Secret = Environment.GetEnvironmentVariable("SECRET"),
+                    Issuer = Environment.GetEnvironmentVariable("ISSUER"),
+                    Audience = Environment.GetEnvironmentVariable("AUDIENCE"),
+                    AccessTokenExpiration = int.Parse(Environment.GetEnvironmentVariable("ACCESS_TOKEN_EXPIRATION")),
+                    RefreshTokenExpiration = int.Parse(Environment.GetEnvironmentVariable("REFRESH_TOKEN_EXPIRATION")),
                 };
             }
             services.AddSingleton(jwtTokenConfig);
