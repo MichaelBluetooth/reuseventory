@@ -23,7 +23,9 @@ using Microsoft.OpenApi.Models;
 using ReuseventoryApi.Authentication;
 using ReuseventoryApi.Models;
 using ReuseventoryApi.Models.DTO;
+using ReuseventoryApi.Services;
 using ReuseventoryApi.Services.CurrentUser;
+using ReuseventoryApi.Services.Listings;
 
 namespace ReuseventoryApi
 {
@@ -113,6 +115,7 @@ namespace ReuseventoryApi
             services.AddHostedService<JwtRefreshTokenCache>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IListingsService, ListingsService>();
 
             services.AddSwaggerGen(c =>
             {

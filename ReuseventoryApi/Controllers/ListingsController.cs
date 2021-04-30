@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using ReuseventoryApi.Helpers;
 using ReuseventoryApi.Models;
 using ReuseventoryApi.Models.DTO;
+using ReuseventoryApi.Services.Listings;
 
 namespace ReuseventoryApi.Controllers
 {
@@ -23,12 +24,14 @@ namespace ReuseventoryApi.Controllers
         private readonly ReuseventoryDbContext _ctx;
         private readonly ILogger<ListingsController> _logger;
         private readonly IMapper _mapper;
+        private readonly ListingsService _listingService;
 
-        public ListingsController(ReuseventoryDbContext ctx, ILogger<ListingsController> logger, IMapper mapper)
+        public ListingsController(ReuseventoryDbContext ctx, ILogger<ListingsController> logger, IMapper mapper, ListingsService listingService)
         {
             _ctx = ctx;
             _logger = logger;
             _mapper = mapper;
+            _listingService = listingService;
 
             if (_ctx.Listings.Count() == 0)
             {
@@ -81,34 +84,25 @@ namespace ReuseventoryApi.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult<PagedResult<Listing>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 1)
+        public ActionResult<PagedResult<ListingDTO>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 1, [FromQuery] string q = "")
         {
-            var results = _ctx.Listings
-                .ProjectTo<ListingDTO>(_mapper.ConfigurationProvider)
-                .GetPaged(page, pageSize);
-            return Ok(results);
+            return Ok(_listingService.searchListings(pageSize, page, q));
         }
 
         [HttpGet]
         [Route("{key}")]
         [AllowAnonymous]
-        public ActionResult<Listing> Get(Guid key)
+        public ActionResult<ListingDTO> Get(Guid key)
         {
             if (Exists(key))
             {
-                Listing result = _ctx.Listings
-                    .Include(l => l.user)
-                    .Include(l => l.tags)
-                    .Where(l => l.id == key)
-                    .FirstOrDefault();
-                return Ok(_mapper.Map<ListingDTO>(result));
+                return Ok(_listingService.getListing(key));
             }
             else
             {
                 return NotFound();
             }
         }
-
 
         [HttpDelete]
         [Route("{key}")]
