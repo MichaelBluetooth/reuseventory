@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.EntityFrameworkCore;
@@ -24,9 +22,9 @@ namespace ReuseventoryApi.Controllers
         private readonly ReuseventoryDbContext _ctx;
         private readonly ILogger<ListingsController> _logger;
         private readonly IMapper _mapper;
-        private readonly ListingsService _listingService;
+        private readonly IListingsService _listingService;
 
-        public ListingsController(ReuseventoryDbContext ctx, ILogger<ListingsController> logger, IMapper mapper, ListingsService listingService)
+        public ListingsController(ReuseventoryDbContext ctx, ILogger<ListingsController> logger, IMapper mapper, IListingsService listingService)
         {
             _ctx = ctx;
             _logger = logger;
