@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReuseventoryApi.Authentication;
 using ReuseventoryApi.Models;
+using ReuseventoryApi.Permissions;
 using ReuseventoryApi.Services.CurrentUser;
 using ReuseventoryApi.Services.Listings;
 
@@ -54,8 +56,6 @@ namespace ReuseventoryApi
                 );
 
             services.AddCors();
-            services.AddAuthorization();
-            services.AddAuthentication();
 
             JwtTokenConfig jwtTokenConfig;
             if (IsDevelopment)
@@ -94,12 +94,22 @@ namespace ReuseventoryApi
                     ClockSkew = TimeSpan.FromMinutes(1)
                 };
             });
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("IsOwnerOrAdmin", policy =>
+                {
+                    policy.AddRequirements(new IsOwnerOrAdminRequirement());
+                });
+            });
 
             services.AddAutoMapper(typeof(Startup));
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IJwtAuthManager, JwtAuthManager>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
+            services.AddTransient<IAuthorizationHandler, IsOwnerOrAdminHandler>();
+
             services.AddHostedService<JwtRefreshTokenCache>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IUserService, UserService>();

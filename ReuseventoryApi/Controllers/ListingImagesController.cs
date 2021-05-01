@@ -22,6 +22,7 @@ namespace ReuseventoryApi.Controllers
 
         [HttpGet]
         [Route("{listingId}")]
+        [AllowAnonymous]
         public ActionResult Get(Guid listingId)
         {
             ListingImage img = _ctx.ListingImages.FirstOrDefault(li => li.listingId == listingId);

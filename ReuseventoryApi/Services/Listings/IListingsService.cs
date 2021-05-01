@@ -8,5 +8,11 @@ namespace ReuseventoryApi.Services.Listings
         PagedResult<ListingDTO> searchListings(int pageSize = 100, int page = 1, string query = "");
 
         ListingDTO getListing(Guid key);
+
+        ListingDTO createListing(ListingCreateOrUpdate listingDTO);
+
+        ListingDTO updateListing(Guid key, ListingCreateOrUpdate update);
+
+        void deleteListing(Guid key);
     }
 }
