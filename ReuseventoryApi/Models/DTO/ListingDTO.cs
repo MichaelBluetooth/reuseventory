@@ -15,6 +15,8 @@ namespace ReuseventoryApi.Models.DTO
         [MaxLength(256)]
         public string description { get; set; }
 
+        public double? price { get; set; }
+
         public UserDTO user { get; set; }
 
         public ICollection<string> tags { get; set; }

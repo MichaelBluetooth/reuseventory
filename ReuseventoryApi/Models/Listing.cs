@@ -22,5 +22,7 @@ namespace ReuseventoryApi.Models
 
         public DateTime created { get; set; }
         public DateTime modified { get; set; }
+
+        public double? price { get; set; }
     }
 }

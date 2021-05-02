@@ -19,7 +19,7 @@ namespace ReuseventoryApi.Services.Listings
         private readonly ILogger<ListingsService> _logger;
         private readonly ICurrentUserService _currentUserService;
 
-        public ListingsService(ReuseventoryDbContext ctx, IMapper mapper, ICurrentUserService currentUserService,  ILogger<ListingsService> logger)
+        public ListingsService(ReuseventoryDbContext ctx, IMapper mapper, ICurrentUserService currentUserService, ILogger<ListingsService> logger)
         {
             _ctx = ctx;
             _mapper = mapper;
@@ -61,7 +61,8 @@ namespace ReuseventoryApi.Services.Listings
                 name = listingDTO.name,
                 description = listingDTO.description,
                 created = DateTime.UtcNow,
-                modified = DateTime.UtcNow
+                modified = DateTime.UtcNow,
+                price = listingDTO.price
             };
 
             User currentUser = _currentUserService.GetCurrentUser();
@@ -130,6 +131,7 @@ namespace ReuseventoryApi.Services.Listings
             original.name = update.name;
             original.description = update.description;
             original.modified = DateTime.UtcNow;
+            original.price = update.price;
             _ctx.Entry(original).State = EntityState.Modified;
             _ctx.SaveChanges();
 
@@ -147,7 +149,7 @@ namespace ReuseventoryApi.Services.Listings
             if (null != doomed)
             {
                 _ctx.Listings.Remove(doomed);
-                _ctx.SaveChanges();                
+                _ctx.SaveChanges();
                 _logger.LogInformation($"User {_currentUserService.GetCurrentUser().username} deleted listing {key}");
             }
         }
