@@ -32,6 +32,7 @@ namespace ReuseventoryApi.Services.Listings
             if (!string.IsNullOrEmpty(query))
             {
                 return _ctx.Listings
+                            .OrderBy(l => l.name)
                             .Include(l => l.user)
                             .Include(l => l.tags)
                             .Where(l => l.name.ToLower().Contains(query.ToLower()) || l.tags.Any(t => t.name.ToLower().Contains(query.ToLower())))
