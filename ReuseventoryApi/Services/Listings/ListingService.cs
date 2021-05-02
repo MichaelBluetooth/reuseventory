@@ -128,6 +128,31 @@ namespace ReuseventoryApi.Services.Listings
                 }
             }
 
+            if (null != update.image && FileHelper.IsImage(update.image))
+            {
+                ListingImage existing = _ctx.ListingImages.FirstOrDefault(li => li.listingId == key);
+                if (null != existing)
+                {
+                    _ctx.ListingImages.Remove(existing);
+                }
+
+                byte[] fileContents = null;
+                using (var fs1 = update.image.OpenReadStream())
+                using (var ms1 = new MemoryStream())
+                {
+                    fs1.CopyTo(ms1);
+                    fileContents = ms1.ToArray();
+                }
+
+                _ctx.ListingImages.Add(new ListingImage()
+                {
+                    listingId = key,
+                    contentType = update.image.ContentType,
+                    image = fileContents,
+                    fileName = Path.GetFileName(update.image.FileName)
+                });
+            }
+
             original.name = update.name;
             original.description = update.description;
             original.modified = DateTime.UtcNow;

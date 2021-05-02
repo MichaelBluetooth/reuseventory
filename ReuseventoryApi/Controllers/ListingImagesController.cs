@@ -35,5 +35,23 @@ namespace ReuseventoryApi.Controllers
                 return File(img.image, img.contentType);
             }
         }
+
+        [HttpDelete]
+        [Route("{listingId}")]
+        [Authorize(Policy = "IsOwnerOrAdmin")]
+        public ActionResult Delete(Guid listingId)
+        {
+            ListingImage img = _ctx.ListingImages.FirstOrDefault(li => li.listingId == listingId);
+            if (null == img)
+            {
+                return NotFound();
+            }
+            else
+            {
+                _ctx.ListingImages.Remove(img);
+                _ctx.SaveChanges();
+                return NoContent();
+            }
+        }
     }
 }
