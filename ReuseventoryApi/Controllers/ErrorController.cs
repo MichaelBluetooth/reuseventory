@@ -20,6 +20,7 @@ namespace ReuseventoryApi.Controllers
         }
 
         [Route("/error-local-development")]
+        [HttpGet]
         public IActionResult ErrorLocalDevelopment([FromServices] IWebHostEnvironment webHostEnvironment)
         {
             if (webHostEnvironment.EnvironmentName != "Development")
@@ -33,6 +34,7 @@ namespace ReuseventoryApi.Controllers
         }
 
         [Route("/error")]
+        [HttpGet]
         public IActionResult Error() => Problem("An unexpected error occured");
     }
 }
