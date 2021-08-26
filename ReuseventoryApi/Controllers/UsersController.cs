@@ -124,7 +124,7 @@ namespace ReuseventoryApi.Controllers
                 return NotFound();
             }
 
-            return Ok(_ctx.Users.Find(key));
+            return Ok(_mapper.Map<UserDTO>(_ctx.Users.Find(key)));
         }
 
         [AllowAnonymous]
@@ -198,6 +198,7 @@ namespace ReuseventoryApi.Controllers
 
         [HttpPost]
         [Route("refresh-token")]
+        [AllowAnonymous]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             try
@@ -210,7 +211,7 @@ namespace ReuseventoryApi.Controllers
                     return Unauthorized();
                 }
 
-                var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
+                var accessToken = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
                 var jwtResult = _jwtAuthManager.Refresh(request.refreshToken, accessToken, DateTime.Now);
                 _logger.LogInformation($"User [{userName}] has refreshed JWT token.");
                 return Ok(new LoginResult

@@ -32,7 +32,7 @@ namespace ReuseventoryApi.Controllers
             }
             else
             {
-                return File(img.image, img.contentType);
+                return File(img.image, img.contentType, img.fileName);
             }
         }
 

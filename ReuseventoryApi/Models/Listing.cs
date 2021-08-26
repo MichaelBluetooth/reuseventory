@@ -20,6 +20,8 @@ namespace ReuseventoryApi.Models
 
         public ICollection<ListingTag> tags { get; set; }
 
+        public ICollection<ListingImage> images { get; set; }
+
         public DateTime created { get; set; }
         public DateTime modified { get; set; }
 

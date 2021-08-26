@@ -16,6 +16,7 @@ using ReuseventoryApi.Models;
 using ReuseventoryApi.Permissions;
 using ReuseventoryApi.Services.CurrentUser;
 using ReuseventoryApi.Services.Listings;
+using ReuseventoryApi.Services.SeedData;
 
 namespace ReuseventoryApi
 {
@@ -101,6 +102,8 @@ namespace ReuseventoryApi
                     policy.AddRequirements(new IsOwnerOrAdminRequirement());
                 });
             });
+
+            services.AddTransient<IStartupFilter, SeedDataStartupFilter>();
 
             services.AddAutoMapper(typeof(Startup));
 
