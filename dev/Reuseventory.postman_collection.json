@@ -57,7 +57,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+					"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"Admin123!\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -115,65 +115,15 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5001/api/listings",
+					"raw": "https://{{host}}:{{port}}/api/listings",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"listings"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST Listing Copy",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Successful POST request\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.environment.set(\"id\", jsonData.id);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{accessToken}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://localhost:5001/api/users/logout",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "5001",
-					"path": [
-						"api",
-						"users",
-						"logout"
 					]
 				}
 			},
@@ -231,12 +181,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5001/api/listings",
+					"raw": "https://{{host}}:{{port}}/api/listings",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"listings"
@@ -297,12 +247,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5001/api/listings",
+					"raw": "https://{{host}}:{{port}}/api/listings",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"listings"
@@ -335,12 +285,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5001/api/listings?pageSize=100&page=0",
+					"raw": "https://{{host}}:{{port}}/api/listings?pageSize=100&page=0",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"listings"
@@ -371,39 +321,12 @@
 					}
 				],
 				"url": {
-					"raw": "https://localhost:5001/api/listings/{{id}}",
+					"raw": "https://{{host}}:{{port}}/api/listings/{{id}}",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
-					"path": [
-						"api",
-						"listings",
-						"{{id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Listing By Id Copy",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{accessToken}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "https://localhost:5001/api/listings/{{id}}",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"listings",
@@ -434,12 +357,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5001/api/listings/{{id}}",
+					"raw": "https://{{host}}:{{port}}/api/listings/{{id}}",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"listings",
@@ -484,12 +407,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5001/api/users/logout",
+					"raw": "https://{{host}}:{{port}}/api/users/logout",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"users",
@@ -511,15 +434,15 @@
 					}
 				],
 				"url": {
-					"raw": "https://localhost:5001/api/listings/{{id}}",
+					"raw": "https://{{host}}:{{port}}/api/listingimages/{{id}}",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "5001",
+					"port": "{{port}}",
 					"path": [
 						"api",
-						"listings",
+						"listingimages",
 						"{{id}}"
 					]
 				}
