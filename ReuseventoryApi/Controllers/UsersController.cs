@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -171,12 +172,17 @@ namespace ReuseventoryApi.Controllers
             }
 
             User user = _userService.findUserByUserName(request.username);
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, request.username)
             };
 
-            var jwtResult = _jwtAuthManager.GenerateTokens(request.username, claims, DateTime.Now);
+            if (user.isAdmin)
+            {
+                claims.Add(new Claim("Role", "admin"));
+            }
+
+            var jwtResult = _jwtAuthManager.GenerateTokens(request.username, claims.ToArray(), DateTime.Now);
             _logger.LogInformation($"User [{request.username}] logged in the system.");
             return Ok(new LoginResult
             {

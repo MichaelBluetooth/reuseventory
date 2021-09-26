@@ -27,21 +27,24 @@ namespace ReuseventoryApi.Services.Listings
             _logger = logger;
         }
 
-        public PagedResult<ListingDTO> searchListings(int pageSize = 100, int page = 1, string query = "")
+        public PagedResult<ListingDTO> searchListings(int pageSize = 100, int page = 1, string query = "", Guid? owner = null)
         {
-            if (!string.IsNullOrEmpty(query))
-            {
-                return _ctx.Listings
+            var dbQuery = _ctx.Listings
                             .OrderBy(l => l.name)
                             .Include(l => l.user)
                             .Include(l => l.tags)
-                            .Where(l => l.name.ToLower().Contains(query.ToLower()) || l.tags.Any(t => t.name.ToLower().Contains(query.ToLower())))
-                            .ProjectTo<ListingDTO>(_mapper.ConfigurationProvider).GetPaged(page, pageSize);
-            }
-            else
+                            .AsQueryable();
+
+            if (!string.IsNullOrEmpty(query))
             {
-                return _ctx.Listings.ProjectTo<ListingDTO>(_mapper.ConfigurationProvider).GetPaged(page, pageSize);
+                dbQuery = dbQuery.Where(l => l.name.ToLower().Contains(query.ToLower()) || l.tags.Any(t => t.name.ToLower().Contains(query.ToLower()))).AsQueryable();
             }
+
+            if(null != owner){
+                dbQuery = dbQuery.Where(l => l.userId == owner).AsQueryable();
+            }
+
+            return dbQuery.ProjectTo<ListingDTO>(_mapper.ConfigurationProvider).GetPaged(page, pageSize);
         }
 
         public ListingDTO getListing(Guid key)

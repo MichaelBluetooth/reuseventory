@@ -99,5 +99,28 @@ namespace ReuseventoryApi.Test.Services.Listings
             }
             Assert.That(containsAllExpectedResults, Is.True, $"The paged results was missing an expected value [{expectedResultsList}], only contained [{String.Join(',', results.Results.Select(r => r.name))}]");
         }
+
+        [Test, Description("Assert the API can filter listings by username")]
+        public void getListingsByUser(){
+            User userA = _ctx.Users.Add(new User() { username = "user_a" }).Entity;
+            User userB = _ctx.Users.Add(new User() { username = "user_b" }).Entity;
+            _ctx.Listings.AddRange(
+                new Listing()
+                {
+                    name = "Listing 1",
+                    userId = userA.id
+                },
+                new Listing()
+                {
+                    name = "Listing 2",
+                    userId = userB.id
+                }
+            );
+            _ctx.SaveChanges();
+
+            PagedResult<ListingDTO> queryResults = _service.searchListings(owner: userA.id);
+            Assert.That(queryResults.Results.Count(), Is.EqualTo(1), "The api should have only returned 1 result");
+            Assert.That(queryResults.Results.Any(l => l.user.id == userA.id), Is.True, "The api did not return the listing created by the given user");
+        }
     }
 }

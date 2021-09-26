@@ -75,7 +75,7 @@ namespace ReuseventoryApi.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult<PagedResult<ListingDTO>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 1, [FromQuery] string q = "")
+        public ActionResult<PagedResult<ListingDTO>> Get([FromQuery] int pageSize = 100, [FromQuery] int page = 1, [FromQuery] string q = "", [FromQuery] Guid? owner = null)
         {
             return Ok(_listingService.searchListings(pageSize, page, q));
         }
