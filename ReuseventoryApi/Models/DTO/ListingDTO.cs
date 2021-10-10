@@ -20,5 +20,7 @@ namespace ReuseventoryApi.Models.DTO
         public UserDTO user { get; set; }
 
         public ICollection<string> tags { get; set; }
+
+        public bool hasImage { get; set; }
     }
 }

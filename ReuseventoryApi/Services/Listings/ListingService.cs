@@ -52,6 +52,7 @@ namespace ReuseventoryApi.Services.Listings
             Listing result = _ctx.Listings
                 .Include(l => l.user)
                 .Include(l => l.tags)
+                .Include(l => l.images)
                 .Where(l => l.id == key)
                 .FirstOrDefault();
             return _mapper.Map<ListingDTO>(result);

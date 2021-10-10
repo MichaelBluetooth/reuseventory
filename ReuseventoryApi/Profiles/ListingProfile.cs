@@ -12,6 +12,7 @@ namespace ReuseventoryApi.Profiles
             CreateMap<ListingCreateOrUpdate, Listing>();
 
             CreateMap<Listing, ListingDTO>()
+                .ForMember(dest => dest.hasImage, opt => opt.MapFrom(so => so.images.Any()))
                 .ForMember(dest => dest.tags, opt => opt.MapFrom(so => so.tags.Select(t => t.name).ToList())); ;
         }
     }
