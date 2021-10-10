@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AutoMapper;
@@ -33,6 +35,7 @@ namespace ReuseventoryApi.Services.Listings
                             .OrderBy(l => l.name)
                             .Include(l => l.user)
                             .Include(l => l.tags)
+                            .Include(l => l.images)
                             .AsQueryable();
 
             if (!string.IsNullOrEmpty(query))
@@ -44,7 +47,21 @@ namespace ReuseventoryApi.Services.Listings
                 dbQuery = dbQuery.Where(l => l.userId == owner).AsQueryable();
             }
 
-            return dbQuery.ProjectTo<ListingDTO>(_mapper.ConfigurationProvider).GetPaged(page, pageSize);
+            var paged = dbQuery.GetPaged(page, pageSize);
+            IList<ListingDTO> results = new List<ListingDTO>();
+            foreach(var result in paged.Results){
+                results.Add(_mapper.Map<ListingDTO>(result));
+            }
+            PagedResult<ListingDTO> pagedResults = new PagedResult<ListingDTO>()
+            {
+                CurrentPage = paged.CurrentPage,
+                PageCount = paged.PageCount,
+                PageSize = paged.PageSize,
+                Results = results,
+                RowCount = paged.RowCount
+            };
+
+            return pagedResults;
         }
 
         public ListingDTO getListing(Guid key)
