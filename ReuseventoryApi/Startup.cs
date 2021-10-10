@@ -92,7 +92,7 @@ namespace ReuseventoryApi
                     ValidAudience = jwtTokenConfig.Audience,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromMinutes(1)
+                    // ClockSkew = TimeSpan.FromMinutes(1)
                 };
             });
             services.AddAuthorization(o =>

@@ -89,7 +89,7 @@ namespace ReuseventoryApi.Authentication
                         ValidAudience = _jwtTokenConfig.Audience,
                         ValidateAudience = true,
                         ValidateLifetime = true,
-                        ClockSkew = TimeSpan.FromMinutes(1)
+                        // ClockSkew = TimeSpan.FromMinutes(1)
                     },
                     out var validatedToken);
             return (principal, validatedToken as JwtSecurityToken);
