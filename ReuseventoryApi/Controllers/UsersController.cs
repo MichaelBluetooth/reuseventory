@@ -174,7 +174,8 @@ namespace ReuseventoryApi.Controllers
             User user = _userService.findUserByUserName(request.username);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, request.username)
+                new Claim(ClaimTypes.Name, request.username),
+                new Claim("Id", request.username)
             };
 
             if (user.isAdmin)
