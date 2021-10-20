@@ -441,6 +441,13 @@ namespace ReuseventoryApi.Services.SeedData
             db.Users.AddRange(
                 new User()
                 {
+                    email = "user1@place.com",
+                    phone = "607-867-5309",
+                    username = "user1",
+                    password = BCrypt.Net.BCrypt.HashPassword("Password123!")
+                },
+                new User()
+                {
                     email = "cbaldocci0@china.com.cn",
                     phone = "616-738-3338",
                     username = "vmcclements0"
